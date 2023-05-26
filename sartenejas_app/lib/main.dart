@@ -1,28 +1,22 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'grutas.dart';
-import 'gastronomia.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'dart:async';
-import 'package:http/http.dart' as http; 
-import 'package:dio/dio.dart'; 
+import 'package:dio/dio.dart';
 
+void main() => runApp(MyApp());
 
-void main() => runApp( MyApp());
-
-class comentario{
+class comentario {
   final int id;
   final String Nombre;
   final String Comentarios;
 
-  comentario( this.id,this.Nombre,this.Comentarios);
+  comentario(this.id, this.Nombre, this.Comentarios);
 }
 
-  
-
- final List<String> imgList = [
+final List<String> imgList = [
   'http://www.sartenejas2.byethost9.com/img/inicio/2.jpg',
   'https://images.unsplash.com/photo-1522205408450-add114ad53fe?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=368f45b0888aeb0b7b08e3a1084d3ede&auto=format&fit=crop&w=1950&q=80',
   'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
@@ -92,22 +86,19 @@ class ComplicatedImageDemo extends StatelessWidget {
   }
 }
 
+class MyApp extends StatelessWidget {
+  MyApp({super.key});
 
+  final dio = Dio();
 
-class MyApp extends StatelessWidget { MyApp({super.key});
-  
-final dio = Dio();
+  final urlBase = 'http://192.168.0.177/Fluter_conn/';
+  final getDatosApi = 'getDatos.php';
 
-final urlBase = 'http://192.168.0.177/Fluter_conn/';
-final getDatosApi = 'getDatos.php';
-
-Future<void> getDatos() async {
-
-  String url = "$urlBase$getDatosApi";
-  final response = await dio.get(url);
-  log(response.data);
-}
-
+  Future<void> getDatos() async {
+    String url = "$urlBase$getDatosApi";
+    final response = await dio.get(url);
+    log(response.data);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,40 +106,39 @@ Future<void> getDatos() async {
       debugShowCheckedModeBanner: false,
       initialRoute: 'main',
       routes: {
-        'grutas' :(BuildContext context) => Grutas(),
+        'grutas': (BuildContext context) => Grutas(),
       },
       title: 'Material App',
       home: Scaffold(
-        floatingActionButton:FloatingActionButton(onPressed: getDatos),
-        drawer:  Drawer(
+        floatingActionButton: FloatingActionButton(onPressed: getDatos),
+        drawer: Drawer(
           child: ListView(
             children: [
-             getMenuWidget(),
+              getMenuWidget(),
               ListTile(
                 title: const Text("Inicio"),
-                onTap: (){
-                   Navigator.push(context,MaterialPageRoute(builder: (context) => Grutas()),);
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Grutas()),
+                  );
                 },
               ),
               ListTile(
                 title: const Text("Grutas"),
-                onTap: (){
-                },
+                onTap: () {},
               ),
               ListTile(
                 title: const Text("Gastronomia"),
-                onTap: (){
-                },
+                onTap: () {},
               ),
               ListTile(
                 title: const Text("Tekax"),
-                onTap: (){
-                },
+                onTap: () {},
               ),
               ListTile(
                 title: const Text("Contacto"),
-                onTap: (){
-                },
+                onTap: () {},
               ),
             ],
           ),
@@ -171,17 +161,17 @@ Future<void> getDatos() async {
 
   UserAccountsDrawerHeader getMenuWidget() {
     return const UserAccountsDrawerHeader(
-              accountName:  Text("Sartenejas II"),
-              accountEmail: Text("Bienvenido"),
-              currentAccountPicture: CircleAvatar(backgroundImage: 
-              AssetImage("assets/imagenes/logo.png"),), 
-              decoration: BoxDecoration( 
-                color: Color.fromARGB(255, 16, 219, 141),
-                image: DecorationImage(
-                  
-                  image: AssetImage("assets/imagenes/bgd.jpg"),
-                )
-              ),
-            );
+      accountName: Text("Sartenejas II"),
+      accountEmail: Text("Bienvenido"),
+      currentAccountPicture: CircleAvatar(
+        backgroundImage: AssetImage("assets/imagenes/logo.png"),
+      ),
+      decoration: BoxDecoration(
+          color: Color.fromARGB(255, 16, 219, 141),
+          image: DecorationImage(
+            image: AssetImage("assets/imagenes/bgd.jpg"),
+            fit: BoxFit.cover,
+          )),
+    );
   }
 }
