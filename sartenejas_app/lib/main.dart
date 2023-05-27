@@ -1,12 +1,14 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:sartenejas_app/model/categorias_model.dart';
+import 'package:sartenejas_app/modules/main/providers/categorias_provider.dart';
 import 'grutas.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'dart:async';
 import 'package:dio/dio.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class comentario {
   final int id;
@@ -27,124 +29,132 @@ final List<String> imgList = [
 
 final List<Widget> imageSliders = imgList
     .map((item) => Container(
-          child: Container(
-            margin: EdgeInsets.all(5.0),
-            child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                child: Stack(
-                  children: <Widget>[
-                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(200, 0, 0, 0),
-                              Color.fromARGB(0, 0, 0, 0)
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
+          margin: const EdgeInsets.all(5.0),
+          child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(5.0)),
+              child: Stack(
+                children: <Widget>[
+                  Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                  Positioned(
+                    bottom: 0.0,
+                    left: 0.0,
+                    right: 0.0,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color.fromARGB(200, 0, 0, 0),
+                            Color.fromARGB(0, 0, 0, 0)
+                          ],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
                         ),
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 20.0),
-                        child: Text(
-                          'No. ${imgList.indexOf(item)} image',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 20.0),
+                      child: Text(
+                        'No. ${imgList.indexOf(item)} image',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ],
-                )),
-          ),
+                  ),
+                ],
+              )),
         ))
     .toList();
 
 class ComplicatedImageDemo extends StatelessWidget {
+  const ComplicatedImageDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Complicated image slider demo')),
-      body: Container(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            autoPlay: true,
-            aspectRatio: 2.0,
-            enlargeCenterPage: true,
-          ),
-          items: imageSliders,
+      appBar: AppBar(title: const Text('Complicated image slider demo')),
+      body: CarouselSlider(
+        options: CarouselOptions(
+          autoPlay: true,
+          aspectRatio: 2.0,
+          enlargeCenterPage: true,
         ),
+        items: imageSliders,
       ),
     );
   }
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
 
-  final dio = Dio();
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
 
-  final urlBase = 'http://192.168.0.177/Fluter_conn/';
-  final getDatosApi = 'getDatos.php';
+class _MyAppState extends State<MyApp> {
+  var _lsCategorias = <CategoriasModel>[];
 
   Future<void> getDatos() async {
-    String url = "$urlBase$getDatosApi";
-    final response = await dio.get(url);
-    log(response.data);
+    _lsCategorias = await CategoriasProvider().getCategorias();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    getDatos();
     return MaterialApp(
+      //theme material
+      theme: ThemeData(
+        primaryColor: const Color.fromARGB(255, 3, 196, 99),
+        accentColor: const Color.fromARGB(255, 3, 196, 99),
+        useMaterial3: true,
+      ),
       debugShowCheckedModeBanner: false,
       initialRoute: 'main',
       routes: {
-        'grutas': (BuildContext context) => Grutas(),
+        'grutas': (BuildContext context) {
+          final categoria =
+              ModalRoute.of(context)!.settings.arguments as CategoriasModel;
+          return GrutasPage(categoria: categoria);
+        },
       },
       title: 'Material App',
       home: Scaffold(
         floatingActionButton: FloatingActionButton(onPressed: getDatos),
         drawer: Drawer(
-          child: ListView(
+          child: Column(
             children: [
               getMenuWidget(),
-              ListTile(
-                title: const Text("Inicio"),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Grutas()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text("Grutas"),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text("Gastronomia"),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text("Tekax"),
-                onTap: () {},
-              ),
-              ListTile(
-                title: const Text("Contacto"),
-                onTap: () {},
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _lsCategorias.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(_lsCategorias[index].nbCategoria),
+                      onTap: () {
+                        if (_lsCategorias[index].nbCategoria == 'Inicio') {
+                          Navigator.pop(context);
+                        } else {
+                          Navigator.pushNamed(context, 'grutas',
+                              arguments: _lsCategorias[index]);
+                        }
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),
         ),
         appBar: AppBar(
-          title: const Text('SartenejaII'),
+          title: const Text(
+            'SartenejaII',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
           backgroundColor: const Color.fromARGB(255, 3, 196, 99),
         ),
         body: CarouselSlider(
