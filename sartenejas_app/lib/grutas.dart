@@ -46,7 +46,6 @@ class _GrutasPageState extends State<GrutasPage> {
 
   //Hola Mundo
   //Este cambio es de hector
-  //Este cambio lo hizo Carlos Enrique
 
   @override
   Widget build(BuildContext context) {
